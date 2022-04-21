@@ -31,6 +31,7 @@ module Terraspace::All
         line.include?("complete! Resources:") || # success: handles both apply and destroy output
         line.include?("Changes to Outputs") ||
         line.include?("No changes") ||
+        line.include?("Terraspace Url") ||
         line.include?("Error: ")  # error
       end
     end

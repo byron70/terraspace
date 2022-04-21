@@ -29,9 +29,19 @@ module Terraspace
     class << self
       include Terraspace::Util::Logging
 
+      @@initial_dispatch_command = nil
+      def initial_dispatch_command
+        @@initial_dispatch_command
+      end
+
       def dispatch(m, args, options, config)
         # Terraspace.argv provides consistency when terraspace is being called by rspec-terraspace test harness
         Terraspace.argv = args.clone # important to clone since Thor removes the first argv
+
+        unless @@initial_dispatch_command
+          @@initial_dispatch_command = "$ terraspace #{args.join(' ')}\n"
+          Terraspace::Logger.buffer << @@initial_dispatch_command
+        end
 
         check_standalone_install!
         check_project!(args.first)

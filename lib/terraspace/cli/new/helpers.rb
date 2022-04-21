@@ -13,7 +13,10 @@ class Terraspace::CLI::New
 
     def gem_line(name)
       if name == "terraspace"
-        %Q|gem "#{name}", '~> #{Terraspace::VERSION}'|
+        # %Q|gem "#{name}", '~> #{Terraspace::VERSION}'|
+        %Q|gem "#{name}", github: "boltops-tools/terraspace", branch: "cloud"|
+      # elsif name == "rspec-terraspace"
+      #   %Q|gem "#{name}", github: "boltops-tools/rspec-terraspace", branch: "cloud"|
       else
         %Q|gem "#{name}"|
       end

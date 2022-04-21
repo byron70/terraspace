@@ -112,6 +112,7 @@ module Terraspace
       end
       if matched
         answer = $stdin.gets
+        logger.stdin_capture(answer.strip)
         stdin.write_nonblock(answer)
       end
     end
@@ -139,8 +140,7 @@ module Terraspace
       if @error && @error.known?
         raise @error.instance
       elsif exit_on_fail
-        logger.error "Error running command: #{@command}".color(:red)
-        exit status
+        raise ShellError.new("Error running command: #{@command}")
       end
     end
   end

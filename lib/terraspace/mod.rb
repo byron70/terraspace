@@ -72,7 +72,7 @@ module Terraspace
     # If the app/stacks/NAME has been removed in source code but stack still exist in the cloud.
     # allow user to delete by materializing an empty stack with the backend.tf
     # Note this does not seem to work for Terraform Cloud as terraform init doesnt seem to download the plugins
-    # required. SIt only works for s3, azurerm, and gcs backends. On TFC, you can delete the stack via the GUI though.
+    # required. It only works for s3, azurerm, and gcs backends. On TFC, you can delete the stack via the GUI though.
     #
     #   down - so user can delete stacks w/o needing to create an empty app/stacks/demo folder
     #   null - for the terraspace summary command when there are zero stacks.
@@ -111,9 +111,9 @@ module Terraspace
     end
 
     # Full path with build_dir
-    def cache_dir
+    def cache_dir(options={})
       # config.build.cache_dir is a String or object that respond_to call. IE:
-      #   :CACHE_ROOT/:REGION/:ENV/:BUILD_DIR
+      #   :REGION/:ENV/:BUILD_DIR
       #   CustomBuildDir.call
       # The call method should return a String pattern used for substitutions
       object = Terraspace.config.build.cache_dir
@@ -128,10 +128,22 @@ module Terraspace
           raise "ERROR: config.build.cache_dir is not a String or responds to the .call method."
         end
 
-      expander = Terraspace::Compiler::Expander.autodetect(self)
-      expander.expansion(pattern) # pattern is a String that contains placeholders for substitutions
+      path = expansion(pattern)
+      path = "#{Terraspace.cache_root}/#{path}"
+      path.gsub!(%r{/+},'/') # remove double slashes are more. IE: // -> / Useful since region is '' in generic expander
+      path
     end
     memoize :cache_dir
+
+    def expansion(pattern)
+      @expander ||= Terraspace::Compiler::Expander.autodetect(self)
+      @expander.expansion(pattern) # pattern is a String that contains placeholders for substitutions
+    end
+
+    def out_option
+      expand = Terraspace::Terraform::Args::Expand.new(self, @options)
+      expand.out
+    end
 
     def type
       root.include?("/stacks/") ? "stack" : "module"

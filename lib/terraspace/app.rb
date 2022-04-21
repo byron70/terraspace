@@ -38,14 +38,18 @@ module Terraspace
       config.autodetect.expander = nil
 
       config.build = ActiveSupport::OrderedOptions.new
-      config.build.cache_dir = ":CACHE_ROOT/:REGION/:ENV/:BUILD_DIR"
-      config.build.cache_root = nil # defaults to /full/path/to/.terraspace-cache
-      config.build.clean_cache = nil # defaults to /full/path/to/.terraspace-cache
+      config.build.cache_dir = ":REGION/:ENV/:BUILD_DIR"
+      config.build.clean_cache = nil # defaults to true
       config.build.default_pass_files = ["/files/"]
       config.build.pass_files = []
 
       config.bundle = ActiveSupport::OrderedOptions.new
       config.bundle.logger = ts_logger
+
+      config.cloud = ActiveSupport::OrderedOptions.new
+      config.cloud.project = "main"
+      config.cloud.org = ENV['TS_ORG'] # required for Terraspace cloud
+      config.cloud.record = "changes" # IE: changes or all
 
       config.hooks = ActiveSupport::OrderedOptions.new
       config.hooks.show = true
